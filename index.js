@@ -27,8 +27,14 @@ var maxrun=-1;
 // intervat to check temperature status
 var temperatureInterval=60*1000;
 
+//interval handlers
+var handlers={
+  temperature:{},
+  battery:{}
+};
+
 // intervat to check battery status
-var batteryInterval=60*1000;
+var batteryInterval=60*60*1000;
 
 if (maxrun>0) {
   setTimeout(function(){
@@ -58,6 +64,12 @@ function getServices(peripheral) {
       console.log(moment().toISOString(),'Error ',err,'connectinh to ',peripheral.advertisement.localName);
     } else {
       peripheral.once('disconnect',function(err){ 
+        if (handlers.temperature[peripheral.id]) {
+          clearInterval(handlers.temperature[peripheral.id]);
+        }
+        if (handlers.battery[peripheral.id]) {
+          clearInterval(handlers.battery[peripheral.id]);
+        }
         console.log(moment().toISOString(),peripheral.advertisement.localName,'reconnect');
         getServices(peripheral);
       });
@@ -80,7 +92,10 @@ function getServices(peripheral) {
               } catch(err){
 
               }
-              setInterval(function(){
+              if (handlers.temperature[peripheral.id]) {
+                clearInterval(handlers.temperature[peripheral.id]);
+              }
+              handlers.temperature[peripheral.id]=setInterval(function(){
                 try{
                   characteristic.read(function(err,data) {
                     if (err) {
@@ -108,7 +123,10 @@ function getServices(peripheral) {
               } catch(err){
                 
               }
-              setInterval(function(){
+              if (handlers.battery[peripheral.id]) {
+                clearInterval(handlers.battery[peripheral.id]);
+              }
+              handlers.battery[peripheral.id]=setInterval(function(){
                 try {
                   characteristic.read(function(err,data) {
                     if (err) {
