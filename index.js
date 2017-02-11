@@ -67,48 +67,64 @@ function getServices(peripheral) {
         } else {
           characteristics.forEach(function(characteristic){
             if (characteristic.uuid=="ff92") {
-              characteristic.read(function(err,data) {
-                if (err) {
-                  console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
-                } else {
-                  var t=[data.readUIntBE(0, 1),data.readUIntBE(2, 1)].join('.');
-                  var h=data.readUIntBE(1, 1);
-                  console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h);
-                }
-              });
-              setInterval(function(){
-                characteristic.read(function(err,data) {
-                if (err) {
-                  console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
-                } else {
-                  var t=[data.readUIntBE(0, 1),data.readUIntBE(2, 1)].join('.');
-                  var h=data.readUIntBE(1, 1);
-                  console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h);
-                }
-              });
-              },temperatureInterval);  
-            } else if (characteristic.uuid=="2a19") {
-              characteristic.read(function(err,data) {
-                if (err) {
-                  console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
-                } else {
-                  var b=data.readUIntBE(0, 1);
-                  console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
-                }
-              });
-              setInterval(function(){
+              try {
                 characteristic.read(function(err,data) {
                   if (err) {
                     console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
                   } else {
-                    if (data){
-                      var b=data.readUIntBE(0, 1);
-                      console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
-                    } else {
-                      console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],'no data');
-                    }
+                    var t=[data.readUIntBE(0, 1),data.readUIntBE(2, 1)].join('.');
+                    var h=data.readUIntBE(1, 1);
+                    console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h);
                   }
                 });
+              } catch(err){
+
+              }
+              setInterval(function(){
+                try{
+                  characteristic.read(function(err,data) {
+                    if (err) {
+                      console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
+                    } else {
+                      var t=[data.readUIntBE(0, 1),data.readUIntBE(2, 1)].join('.');
+                      var h=data.readUIntBE(1, 1);
+                      console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h);
+                    }
+                  });
+                } catch(err){
+
+                }
+              },temperatureInterval);  
+            } else if (characteristic.uuid=="2a19") {
+              try {
+                characteristic.read(function(err,data) {
+                  if (err) {
+                    console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
+                  } else {
+                    var b=data.readUIntBE(0, 1);
+                    console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
+                  }
+                });
+              } catch(err){
+                
+              }
+              setInterval(function(){
+                try {
+                  characteristic.read(function(err,data) {
+                    if (err) {
+                      console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
+                    } else {
+                      if (data){
+                        var b=data.readUIntBE(0, 1);
+                        console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
+                      } else {
+                        console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],'no data');
+                      }
+                    }
+                  });
+                } catch(err){
+                
+                }
               },batteryInterval);
             }             
           });
