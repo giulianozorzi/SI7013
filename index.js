@@ -24,6 +24,9 @@ var characteristicUUIDs = ["2a19","ff92"];
 // set to number of seconds to limit execution time
 var maxrun=-1;
 
+// intervat to check temperature status
+var temperatureInterval=60*1000;
+
 // intervat to check battery status
 var batteryInterval=60*1000;
 
@@ -49,28 +52,41 @@ noble.on('discover', function(peripheral) {
 });
 
 function getServices(peripheral) {
+
   peripheral.connect(function(err) {
     if (err) {
       console.log(moment().toISOString(),'Error ',err,'connectinh to ',peripheral.advertisement.localName);
     } else {
+      peripheral.once('disconnect',function(err){ 
+        console.log(moment().toISOString(),peripheral.advertisement.localName,'reconnect');
+        getServices(peripheral);
+      });
       peripheral.discoverSomeServicesAndCharacteristics(serviceUUIDs,characteristicUUIDs,function(error, services,characteristics){
         if (err) {
           console.log(moment().toISOString(),'Discovery error',err,'for',peripheral.advertisement.localName);
         } else {
           characteristics.forEach(function(characteristic){
             if (characteristic.uuid=="ff92") {
-              characteristic.notify(true, function(error) {
-                if (error) {
-                  console.log(moment().toISOString(),'Notification error');
+              characteristic.read(function(err,data) {
+                if (err) {
+                  console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
                 } else {
-                  //console.log(peripheral.advertisement.localName,'notification on',characteristic.uuid);
-                  characteristic.on('read', function(data, isNotification) {
-                    var t=[data.readUIntBE(0, 1),data.readUIntBE(2, 1)].join('.');
-                    var h=data.readUIntBE(1, 1);
-                    console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h);
-                  });
+                  var t=[data.readUIntBE(0, 1),data.readUIntBE(2, 1)].join('.');
+                  var h=data.readUIntBE(1, 1);
+                  console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h);
                 }
               });
+              setInterval(function(){
+                characteristic.read(function(err,data) {
+                if (err) {
+                  console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
+                } else {
+                  var t=[data.readUIntBE(0, 1),data.readUIntBE(2, 1)].join('.');
+                  var h=data.readUIntBE(1, 1);
+                  console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h);
+                }
+              });
+              },temperatureInterval);  
             } else if (characteristic.uuid=="2a19") {
               characteristic.read(function(err,data) {
                 if (err) {
@@ -85,8 +101,12 @@ function getServices(peripheral) {
                   if (err) {
                     console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
                   } else {
-                    var b=data.readUIntBE(0, 1);
-                    console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
+                    if (data){
+                      var b=data.readUIntBE(0, 1);
+                      console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
+                    } else {
+                      console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],'no data');
+                    }
                   }
                 });
               },batteryInterval);
