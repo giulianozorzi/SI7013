@@ -1,0 +1,16 @@
+{
+  "name": "SI7013 test",
+  "version": "1.0.0",
+  "description": "SI7013 test",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Giuliano Zorzi",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.1.4",
+    "moment": "^2.17.1",
+    "noble": "^1.7.0"
+  }
+}
