@@ -27,6 +27,9 @@ var maxrun=-1;
 // intervat to check temperature status
 var temperatureInterval=60*1000;
 
+// reconnection interval
+var reconnectInterval=60*1000;
+
 //interval handlers
 var handlers={
   temperature:{},
@@ -64,14 +67,16 @@ function getServices(peripheral) {
       console.log(moment().toISOString(),'Error ',err,'connectinh to ',peripheral.advertisement.localName);
     } else {
       peripheral.once('disconnect',function(err){ 
-        if (handlers.temperature[peripheral.id]) {
-          clearInterval(handlers.temperature[peripheral.id]);
-        }
-        if (handlers.battery[peripheral.id]) {
-          clearInterval(handlers.battery[peripheral.id]);
-        }
-        console.log(moment().toISOString(),peripheral.advertisement.localName,'reconnect');
-        getServices(peripheral);
+        setTimeout(function(){
+          if (handlers.temperature[peripheral.id]) {
+            clearInterval(handlers.temperature[peripheral.id]);
+          }
+          if (handlers.battery[peripheral.id]) {
+            clearInterval(handlers.battery[peripheral.id]);
+          }
+          console.log(moment().toISOString(),peripheral.advertisement.localName,'reconnect');
+          getServices(peripheral);
+        },reconnectInterval);
       });
       peripheral.discoverSomeServicesAndCharacteristics(serviceUUIDs,characteristicUUIDs,function(error, services,characteristics){
         if (err) {
