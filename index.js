@@ -84,9 +84,9 @@ function getServices(peripheral) {
                   if (err) {
                     console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
                   } else {
-                    var t=[data.readUIntBE(0, 1),data.readUIntBE(2, 1)].join('.');
-                    var h=data.readUIntBE(1, 1);
-                    console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h);
+                    var t=[data.readInt8(0, 1),data.readInt8(2, 1)].join('.');
+                    var h=data.readInt8(1, 1);
+                    console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h,data);
                   }
                 });
               } catch(err){
@@ -101,9 +101,9 @@ function getServices(peripheral) {
                     if (err) {
                       console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
                     } else {
-                      var t=[data.readUIntBE(0, 1),data.readUIntBE(2, 1)].join('.');
-                      var h=data.readUIntBE(1, 1);
-                      console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h);
+                      var t=[data.readInt8(0, 1),data.readInt8(2, 1)].join('.');
+                      var h=data.readInt8(1, 1);
+                      console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h,data);
                     }
                   });
                 } catch(err){
@@ -116,7 +116,7 @@ function getServices(peripheral) {
                   if (err) {
                     console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
                   } else {
-                    var b=data.readUIntBE(0, 1);
+                    var b=data.readInt8(0, 1);
                     console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
                   }
                 });
@@ -133,7 +133,7 @@ function getServices(peripheral) {
                       console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
                     } else {
                       if (data){
-                        var b=data.readUIntBE(0, 1);
+                        var b=data.readInt8(0, 1);
                         console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
                       } else {
                         console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],'no data');
