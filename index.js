@@ -1,5 +1,6 @@
 var noble = require('noble');
 var moment = require('moment');
+var fs = require('fs');
 
 var sensors=null;
 try {
@@ -55,7 +56,7 @@ noble.on('stateChange', function(state) {
 
 noble.on('discover', function(peripheral) {
   if (!sensors || sensors.length==0 || sensors.indexOf(peripheral.id)>-1) {
-    console.log(moment().toISOString(),'Found ',peripheral.advertisement.localName,'(' , peripheral.id , ')');
+    console.log(moment().toISOString(),peripheral.advertisement.localName,'found (' , peripheral.id , ')');
     getServices(peripheral);
   }
 });
@@ -91,6 +92,7 @@ function getServices(peripheral) {
                   } else {
                     var t=[data.readInt8(0, 1),data.readInt8(2, 1)].join('.');
                     var h=data.readInt8(1, 1);
+                    fs.appendFile(peripheral.advertisement.localName.trim()+'_temperature.txt', moment().toISOString()+','+t+','+h+'\r\n', function (err) {});
                     console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h,data);
                   }
                 });
@@ -108,6 +110,7 @@ function getServices(peripheral) {
                     } else {
                       var t=[data.readInt8(0, 1),data.readInt8(2, 1)].join('.');
                       var h=data.readInt8(1, 1);
+                      fs.appendFile(peripheral.advertisement.localName.trim()+'_temperature.txt', moment().toISOString()+','+t+','+h+'\r\n', function (err) {});
                       console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],t,h,data);
                     }
                   });
@@ -122,6 +125,7 @@ function getServices(peripheral) {
                     console.log(moment().toISOString(),'Error reading',characteristic,peripheral.advertisement.localName);
                   } else {
                     var b=data.readInt8(0, 1);
+                    fs.appendFile(peripheral.advertisement.localName.trim()+'_battery.txt', moment().toISOString()+','+b+'\r\n', function (err) {});
                     console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
                   }
                 });
@@ -139,6 +143,7 @@ function getServices(peripheral) {
                     } else {
                       if (data){
                         var b=data.readInt8(0, 1);
+                        fs.appendFile(peripheral.advertisement.localName.trim()+'_battery.txt', moment().toISOString()+','+b+'\r\n', function (err) {});
                         console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],b);
                       } else {
                         console.log(moment().toISOString(),peripheral.advertisement.localName,characteristics_names[characteristic.uuid],'no data');

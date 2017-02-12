@@ -14,3 +14,7 @@ to install all the depepndencies
 Then use
 node indes.jx 
 to run the software
+
+
+Output
+the application outputs on screen and on individual txt files (two per sensors, one for temperature and one for battery level)
